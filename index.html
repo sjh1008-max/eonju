@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리학교 급식 대기시간 안내</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 25px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status-card {
+            background: #eef9f1;
+            border: 2px solid #2ecc71;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .status-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .wait-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 5px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #2ecc71;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .info-item span {
+            display: block;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 3px;
+        }
+        .menu-box {
+            text-align: left;
+            background: #fff9db;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .menu-title {
+            font-weight: bold;
+            color: #f08c00;
+            margin-bottom: 5px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #4dabf7;
+            color: white;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #339af0;
+        }
+        .btn-refresh {
+            background: #868e96;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🍱 급식실 실시간 현황</h1>
+
+    <!-- 대기 시간 안내 카드 -->
+    <div class="status-card" id="statusCard">
+        <div class="status-title">지금 줄 서면 예상 대기시간</div>
+        <div class="wait-time"><span id="waitTime">5</span>분</div>
+        <div class="status-badge" id="statusBadge">원활</div>
+    </div>
+
+    <!-- 정보 표시 -->
+    <div class="info-grid">
+        <div class="info-item">현재 대기 인원<span id="peopleCount">15명</span></div>
+        <div class="info-item">배식 속도<span id="speed">1분당 10명</span></div>
+    </div>
+
+    <!-- 오늘의 급식 메뉴 -->
+    <div class="menu-box">
+        <div class="menu-title">📢 오늘의 급식 메뉴</div>
+        <div id="todayMenu">쌀밥, 돈까스, 칠리소스, 깍두기, 푸딩</div>
+    </div>
+
+    <!-- 버튼 영역 (시연/업데이트용) -->
+    <div class="btn-group">
+        <button class="btn-refresh" onclick="updateData()">🔄 새로고침</button>
+        <button onclick="simulateQueue()">+ 대기자 증가 시연</button>
+    </div>
+</div>
+
+<script>
+    // 상태 데이터 (배식 속도: 1분당 10명 처리 기준)
+    let currentPeople = 15;
+    const speedPerMinute = 10;
+
+    function render() {
+        // 대기시간 계산 (대기인원 / 분당 처리인원)
+        let time = Math.ceil(currentPeople / speedPerMinute);
+        if (time < 1) time = 1;
+
+        document.getElementById('peopleCount').innerText = `${currentPeople}명`;
+        document.getElementById('waitTime').innerText = time;
+
+        const card = document.getElementById('statusCard');
+        const badge = document.getElementById('statusBadge');
+        const waitTimeEl = document.querySelector('.wait-time');
+
+        // 혼잡도에 따른 색상 및 텍스트 변경
+        if (time <= 5) {
+            card.style.backgroundColor = "#eef9f1";
+            card.style.borderColor = "#2ecc71";
+            badge.style.backgroundColor = "#2ecc71";
+            badge.innerText = "원활";
+            waitTimeEl.style.color = "#27ae60";
+        } else if (time <= 12) {
+            card.style.backgroundColor = "#fff9db";
+            card.style.borderColor = "#f1c40f";
+            badge.style.backgroundColor = "#f1c40f";
+            badge.innerText = "보통";
+            waitTimeEl.style.color = "#f39c12";
+        } else {
+            card.style.backgroundColor = "#fff5f5";
+            card.style.borderColor = "#ff6b6b";
+            badge.style.backgroundColor = "#ff6b6b";
+            badge.innerText = "혼잡";
+            waitTimeEl.style.color = "#e74c3c";
+        }
+    }
+
+    // 새로고침 버튼 작동
+    function updateData() {
+        // 실제 구현 시 서버에서 데이터를 가져오는 코드가 들어갑니다.
+        render();
+    }
+
+    // 버튼 클릭 시 인원수 변경 시연
+    function simulateQueue() {
+        currentPeople += 15;
+        if (currentPeople > 100) currentPeople = 5; // 리셋
+        render();
+    }
+
+    // 초기 실행
+    render();
+</script>
+
+</body>
+</html>
