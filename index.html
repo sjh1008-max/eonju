@@ -1,331 +1,438 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>급식실 실시간 대기 현황 (세밀한 조절)</title>
-    <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --primary-color: #4A90E2;
-            --text-color: #333333;
-            --success-color: #2ECC71;
-            --warning-color: #F1C40F;
-            --danger-color: #E74C3C;
-        }
-
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            padding: 24px;
-            box-sizing: border-box;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: #1a1a1a;
-        }
-
-        .status-box {
-            background-color: #eef7ff;
-            border: 2px solid var(--primary-color);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .status-title {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .wait-time-display {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin: 5px 0;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            color: white;
-            font-weight: 700;
-            font-size: 0.85rem;
-            background-color: var(--primary-color);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .info-card {
-            background-color: #f1f3f5;
-            padding: 14px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .info-label {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .control-panel {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .control-title {
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #555;
-        }
-
-        /* 미세 조절 버튼 그룹 */
-        .btn-group {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        button.btn-sub {
-            background-color: #868e96;
-        }
-
-        button.btn-clear {
-            background-color: #fa5252;
-        }
-
-        /* 슬라이더 및 직접 입력 제어 영역 */
-        .input-control-box {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .direct-input-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .direct-input-group label {
-            font-size: 0.85rem;
-            color: #495057;
-            font-weight: 600;
-        }
-
-        .direct-input-group input[type="number"] {
-            width: 80px;
-            padding: 6px 10px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 1rem;
-            text-align: right;
-            font-weight: bold;
-        }
-
-        .slider-container input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>급식 줄패스 (YUM PASS)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #059669;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.4);
+      transition: transform 0.1s ease;
+    }
+    .custom-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    @keyframes floatEmoji {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg) scale(1.3);
+        opacity: 0;
+      }
+    }
+    .floating-emoji {
+      position: fixed;
+      bottom: -50px;
+      z-index: 1000;
+      pointer-events: none;
+      animation: floatEmoji 4s linear infinite;
+    }
+  </style>
 </head>
-<body>
+<body class="text-gray-800 pb-12">
 
-<div class="app-container">
-    <div class="header">
-        <h1>🍱 급식실 실시간 대기 현황</h1>
+  <!-- 상단 헤더 -->
+  <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-utensils text-2xl text-emerald-200"></i>
+        <h1 class="text-xl font-bold tracking-tight">급식 줄패스 <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-normal">PRO</span></h1>
+      </div>
+      <div class="text-xs bg-emerald-700 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+        <span>실시간 예측 중</span>
+      </div>
     </div>
+  </header>
 
-    <!-- 대기 시간 메인 표시 영역 -->
-    <div class="status-box" id="statusBox">
-        <div class="status-title">예상 대기 시간</div>
-        <div class="wait-time-display"><span id="waitTime">0</span>분</div>
-        <div class="status-badge" id="statusBadge">원활</div>
-    </div>
+  <main class="max-w-md mx-auto px-4 pt-4 space-y-5">
 
-    <!-- 세부 정보 Grid -->
-    <div class="info-grid">
-        <div class="info-card">
-            <div class="info-label">현재 대기 인원</div>
-            <div class="info-value" id="queueLength">0 명</div>
-        </div>
-        <div class="info-card">
-            <div class="info-label">분당 처리 인원</div>
-            <div class="info-value">약 10 명</div>
-        </div>
-    </div>
+    <!-- 1. 대기 시간 계산기 Card -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-emerald-600"></i>
+          대기 시간 계산기
+        </h2>
+        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">분당 15명 처리</span>
+      </div>
 
-    <!-- 미세 조절 및 슬라이더 제어판 -->
-    <div class="control-panel">
-        <div class="control-title">⚙️ 실시간 인원 세밀 조절</div>
-
-        <!-- 슬라이더 및 직접 입력 -->
-        <div class="input-control-box">
-            <div class="direct-input-group">
-                <label for="numInput">직접 인원 입력:</label>
-                <div>
-                    <input type="number" id="numInput" value="0" min="0" max="200" oninput="onDirectInput(this.value)"> 명
-                </div>
-            </div>
-            <div class="slider-container">
-                <input type="range" id="queueSlider" min="0" max="100" value="0" step="1" oninput="onSliderChange(this.value)">
-            </div>
+      <!-- 슬라이더 & 숫자 입력 -->
+      <div class="bg-emerald-50/60 rounded-xl p-4 mb-4 border border-emerald-100">
+        <div class="flex justify-between items-center mb-2">
+          <label for="queueInput" class="text-sm font-semibold text-emerald-900">내 앞의 대기 인원</label>
+          <div class="flex items-center space-x-1">
+            <input type="number" id="queueInput" min="0" max="70" value="25" 
+                   class="w-16 text-right font-bold text-lg text-emerald-700 bg-white border border-emerald-300 rounded-lg px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <span class="text-sm font-bold text-emerald-800">명</span>
+          </div>
         </div>
 
-        <!-- 1명, 3명, 5명 미세 버튼 -->
-        <div class="btn-group">
-            <button class="btn-sub" onclick="changeQueue(-5)">-5명</button>
-            <button class="btn-sub" onclick="changeQueue(-3)">-3명</button>
-            <button class="btn-sub" onclick="changeQueue(-1)">-1명</button>
-            <button onclick="changeQueue(1)">+1명</button>
-            <button onclick="changeQueue(3)">+3명</button>
-            <button onclick="changeQueue(5)">+5명</button>
+        <input type="range" id="queueSlider" min="0" max="70" value="25" step="1"
+               class="w-full h-2.5 bg-emerald-200 rounded-lg appearance-none cursor-pointer custom-slider accent-emerald-600 my-2">
+
+        <div class="flex justify-between text-xs text-gray-400 font-medium px-0.5">
+          <span>0명</span>
+          <span>35명</span>
+          <span>70명</span>
+        </div>
+      </div>
+
+      <!-- 위트 메시지 -->
+      <div id="witMessage" class="text-xs text-center font-medium bg-emerald-100/70 text-emerald-800 py-2 px-3 rounded-lg mb-4 flex items-center justify-center gap-1.5 transition-all duration-300">
+        <i class="fa-solid fa-face-smile text-emerald-600"></i>
+        <span id="witText">잠시만 기다리면 금방 먹을 수 있어요!</span>
+      </div>
+
+      <!-- 결과 표시 -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-gray-50 p-3.5 rounded-xl text-center border border-gray-100">
+          <span class="text-xs text-gray-500 block mb-1">예상 대기시간</span>
+          <div class="text-2xl font-black text-emerald-600 tracking-tight" id="waitTimeDisplay">약 2분</div>
+        </div>
+        <div class="bg-gray-50 p-3.5 rounded-xl text-center border border-gray-100">
+          <span class="text-xs text-gray-500 block mb-1">예상 식사 시작</span>
+          <div class="text-2xl font-black text-gray-700 tracking-tight" id="startTimeDisplay">12:32 PM</div>
+        </div>
+      </div>
+
+      <!-- 시간대별 혼잡도 예측 차트 -->
+      <div class="mt-5 pt-4 border-t border-gray-100">
+        <div class="flex justify-between items-center mb-2.5">
+          <span class="text-xs font-bold text-gray-600">시간대별 혼잡도 예측</span>
+          <span class="text-[10px] text-gray-400">* 12:20 ~ 12:35 피크타임</span>
+        </div>
+        <div class="flex items-end justify-between h-20 pt-4 px-2 bg-emerald-50/30 rounded-lg">
+          <div class="flex flex-col items-center gap-1 w-1/5">
+            <div class="w-full bg-emerald-300 rounded-t h-6 transition-all duration-300"></div>
+            <span class="text-[10px] text-gray-500">12:00</span>
+          </div>
+          <div class="flex flex-col items-center gap-1 w-1/5">
+            <div class="w-full bg-emerald-400 rounded-t h-10 transition-all duration-300"></div>
+            <span class="text-[10px] text-gray-500">12:10</span>
+          </div>
+          <div class="flex flex-col items-center gap-1 w-1/5">
+            <div class="w-full bg-emerald-600 rounded-t h-16 transition-all duration-300"></div>
+            <span class="text-[10px] text-emerald-700 font-bold">12:20</span>
+          </div>
+          <div class="flex flex-col items-center gap-1 w-1/5">
+            <div class="w-full bg-emerald-500 rounded-t h-12 transition-all duration-300"></div>
+            <span class="text-[10px] text-gray-500">12:30</span>
+          </div>
+          <div class="flex flex-col items-center gap-1 w-1/5">
+            <div class="w-full bg-emerald-300 rounded-t h-7 transition-all duration-300"></div>
+            <span class="text-[10px] text-gray-500">12:40</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 오늘 급식 메뉴 카드 (반찬별 칼로리) -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-bowl-food text-emerald-600"></i>
+          오늘의 급식 메뉴
+        </h2>
+        <span class="text-xs text-emerald-700 bg-emerald-50 font-semibold px-2 py-1 rounded-full">
+          총 <span id="totalKcal">780</span> kcal
+        </span>
+      </div>
+
+      <div class="divide-y divide-gray-100 bg-gray-50/80 rounded-xl px-3.5 py-1 border border-gray-100">
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🍚 현미잡곡밥</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">280 kcal</span>
+        </div>
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🍲 얼큰 소고기뭇국</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">120 kcal</span>
+        </div>
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🍖 수제 찹스테이크</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">250 kcal</span>
+        </div>
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🥗 감자콘샐러드</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">90 kcal</span>
+        </div>
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🥬 포기김치</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">15 kcal</span>
+        </div>
+        <div class="py-2.5 flex justify-between items-center">
+          <span class="font-bold text-gray-800 text-sm">🧃 샤인머스캣 에이드</span>
+          <span class="text-xs bg-white text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">25 kcal</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 타임킬러 미니 퀴즈 Card -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <i class="fa-solid fa-gamepad text-emerald-600"></i>
+          타임킬러 1분 퀴즈
+        </h2>
+        <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded" id="quizProgress">1 / 3</span>
+      </div>
+
+      <div id="quizContainer">
+        <!-- 퀴즈 질문 -->
+        <p class="text-sm font-semibold text-gray-800 mb-3" id="quizQuestion">
+          Q. 식사 후 졸음이 오는 식곤증을 예방하는 올바른 습관은?
+        </p>
+
+        <!-- 보기 버튼들 -->
+        <div class="space-y-2" id="quizOptions">
+          <!-- JS에서 동적 생성 -->
         </div>
 
-        <div class="btn-group">
-            <button class="btn-clear" onclick="setPreset(0)">초기화 (0명)</button>
+        <!-- 피드백 메시지 -->
+        <div id="quizFeedback" class="mt-3 text-xs font-semibold hidden text-center py-2 rounded-lg"></div>
+      </div>
+
+      <!-- 퀴즈 완료 시 표시될 영역 -->
+      <div id="quizCompleteCard" class="hidden text-center py-6 space-y-3">
+        <div class="text-4xl animate-bounce">🎉</div>
+        <h3 class="text-xl font-black text-emerald-600">축하합니다!</h3>
+        <p class="text-sm text-gray-600 font-medium">
+          모든 퀴즈를 완료했습니다!<br/>맛있는 급식을 즐겨보세요 😋
+        </p>
+      </div>
+    </section>
+
+    <!-- 4. 실시간 줄 상태 원클릭 제보 -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-1">
+        <i class="fa-solid fa-users text-emerald-600"></i>
+        실시간 줄 상태 제보
+      </h2>
+      <p class="text-xs text-gray-500 mb-3">지금 줄 상태는 어떤가요? 버튼을 눌러 제보해 주세요!</p>
+
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="voteStatus('쾌적')" class="py-2.5 px-2 bg-emerald-50 hover:bg-emerald-100 active:scale-95 border border-emerald-200 rounded-xl text-center transition">
+          <span class="block text-xl mb-0.5">🟢</span>
+          <span class="text-xs font-bold text-emerald-800">쾌적함</span>
+        </button>
+        <button onclick="voteStatus('보통')" class="py-2.5 px-2 bg-amber-50 hover:bg-amber-100 active:scale-95 border border-amber-200 rounded-xl text-center transition">
+          <span class="block text-xl mb-0.5">🟡</span>
+          <span class="text-xs font-bold text-amber-800">보통</span>
+        </button>
+        <button onclick="voteStatus('혼잡')" class="py-2.5 px-2 bg-rose-50 hover:bg-rose-100 active:scale-95 border border-rose-200 rounded-xl text-center transition">
+          <span class="block text-xl mb-0.5">🔴</span>
+          <span class="text-xs font-bold text-rose-800">매우혼잡</span>
+        </button>
+      </div>
+
+      <!-- 제보 데이터 반영 통계 -->
+      <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs">
+        <div class="flex justify-between text-gray-600 mb-1 font-medium">
+          <span>최근 10분간 학생 제보</span>
+          <span id="totalVotes">총 24명 참여</span>
         </div>
-    </div>
-</div>
+        <div class="w-full bg-gray-200 rounded-full h-2 flex overflow-hidden">
+          <div id="barSmooth" class="bg-emerald-500 h-full transition-all duration-500" style="width: 50%"></div>
+          <div id="barNormal" class="bg-amber-400 h-full transition-all duration-500" style="width: 35%"></div>
+          <div id="barBusy" class="bg-rose-500 h-full transition-all duration-500" style="width: 15%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-gray-500 mt-1.5 font-medium">
+          <span class="text-emerald-700">쾌적 <span id="smoothPercent">50</span>%</span>
+          <span class="text-amber-700">보통 <span id="normalPercent">35</span>%</span>
+          <span class="text-rose-700">혼잡 <span id="busyPercent">15</span>%</span>
+        </div>
+      </div>
+    </section>
 
-<script>
-    // 시스템 변수
-    let queueCount = 0;
-    const processRatePerMinute = 10; // 분당 처리 인원 수
+  </main>
 
-    // 대기시간 계산 및 UI 전체 업데이트 함수
-    function updateDashboard() {
-        // 예상 대기 시간 계산 (올림 처리)
-        let calculatedTime = Math.ceil(queueCount / processRatePerMinute);
+  <script>
+    // --- 1. 대기시간 계산 로직 ---
+    const queueSlider = document.getElementById('queueSlider');
+    const queueInput = document.getElementById('queueInput');
+    const waitTimeDisplay = document.getElementById('waitTimeDisplay');
+    const startTimeDisplay = document.getElementById('startTimeDisplay');
+    const witText = document.getElementById('witText');
+
+    const PROCESS_RATE_PER_MIN = 15; // 분당 15명 처리
+
+    function updateCalculations() {
+      let count = parseInt(queueInput.value) || 0;
+      
+      if (count > 70) count = 70;
+      if (count < 0) count = 0;
+
+      queueSlider.value = count;
+      queueInput.value = count;
+
+      const waitMinutes = Math.ceil(count / PROCESS_RATE_PER_MIN);
+      waitTimeDisplay.textContent = count === 0 ? "바로 입장" : `약 ${waitMinutes}분`;
+
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + waitMinutes);
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      startTimeDisplay.textContent = `${hours}:${minutes} ${ampm}`;
+
+      // 위트 메시지 변경
+      if (count <= 10) {
+        witText.textContent = "🚀 초스피드 입장 가능! 발걸음을 넓혀보세요!";
+      } else if (count <= 30) {
+        witText.textContent = "😊 적당한 줄이에요. 미니 퀴즈 한 문제 풀면 도착!";
+      } else if (count <= 50) {
+        witText.textContent = "⌛ 조금 붐비네요! 친구와 급식 메뉴 이야기를 나눠봐요.";
+      } else {
+        witText.textContent = "🔥 최고 혼잡 수준! 퀴즈 3개를 다 풀 때쯤 입장 가능!";
+      }
+    }
+
+    queueSlider.addEventListener('input', (e) => {
+      queueInput.value = e.target.value;
+      updateCalculations();
+    });
+
+    queueInput.addEventListener('input', updateCalculations);
+    updateCalculations();
+
+    // --- 2. 퀴즈 기능 ---
+    const quizData = [
+      {
+        question: "Q. 식사 후 급격한 식곤증을 예방하는 올바른 급식 식사 순서는?",
+        options: ["채소 ➔ 단백질 ➔ 탄수화물", "탄수화물 ➔ 단백질 ➔ 채소", "단백질 ➔ 탄수화물 ➔ 채소"],
+        answer: 0
+      },
+      {
+        question: "Q. 오늘 메뉴 '샤인머스캣'의 원래 대표산지 국가로 가장 유력한 곳은?",
+        options: ["미국", "일본", "프랑스"],
+        answer: 1
+      },
+      {
+        question: "Q. 하루 적정 나트륨 섭취 권장량(WHO 기준)은 약 몇 g 일까요?",
+        options: ["2g (소금 약 5g)", "10g (소금 약 25g)", "20g (소금 약 50g)"],
+        answer: 0
+      }
+    ];
+
+    let currentQuizIndex = 0;
+
+    function renderQuiz() {
+      const q = quizData[currentQuizIndex];
+      document.getElementById('quizProgress').textContent = `${currentQuizIndex + 1} / ${quizData.length}`;
+      document.getElementById('quizQuestion').textContent = q.question;
+      
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+
+      const feedback = document.getElementById('quizFeedback');
+      feedback.className = 'mt-3 text-xs font-semibold hidden text-center py-2 rounded-lg';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition text-xs font-medium text-gray-700 bg-white shadow-sm';
+        btn.textContent = `${idx + 1}. ${opt}`;
+        btn.onclick = () => checkQuizAnswer(idx, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkQuizAnswer(selectedIdx, btnElement) {
+      const q = quizData[currentQuizIndex];
+      const feedback = document.getElementById('quizFeedback');
+
+      if (selectedIdx === q.answer) {
+        feedback.textContent = "🎉 정답입니다! 잠시 후 다음 문제로 넘어갑니다.";
+        feedback.className = "mt-3 text-xs font-semibold text-emerald-800 bg-emerald-100 py-2 rounded-lg text-center";
+        feedback.classList.remove('hidden');
+
+        // 보기 클릭 차단
+        document.querySelectorAll('#quizOptions button').forEach(b => b.disabled = true);
+
+        setTimeout(() => {
+          currentQuizIndex++;
+          if (currentQuizIndex < quizData.length) {
+            renderQuiz();
+          } else {
+            showQuizCompletion();
+          }
+        }, 1200);
+      } else {
+        feedback.textContent = "❌ 아쉽네요! 정답이 아닙니다. 다시 시도해 보세요!";
+        feedback.className = "mt-3 text-xs font-semibold text-rose-800 bg-rose-100 py-2 rounded-lg text-center";
+        feedback.classList.remove('hidden');
         
-        // 인원이 1명 이상일 때 최소 1분 표시
-        if (queueCount > 0 && calculatedTime === 0) {
-            calculatedTime = 1;
-        }
-
-        // 텍스트 및 입력창 동기화
-        document.getElementById('queueLength').innerText = `${queueCount} 명`;
-        document.getElementById('waitTime').innerText = calculatedTime;
-        document.getElementById('numInput').value = queueCount;
-        document.getElementById('queueSlider').value = queueCount > 100 ? 100 : queueCount;
-
-        // 엘리먼트 참조
-        const statusBox = document.getElementById('statusBox');
-        const statusBadge = document.getElementById('statusBadge');
-        const waitTimeDisplay = document.querySelector('.wait-time-display');
-
-        // 혼잡도 상태별 테마 변경
-        if (calculatedTime <= 3) {
-            // 원활 (초록색)
-            statusBox.style.backgroundColor = '#eefbf4';
-            statusBox.style.borderColor = '#2ECC71';
-            statusBadge.style.backgroundColor = '#2ECC71';
-            statusBadge.innerText = '원활';
-            waitTimeDisplay.style.color = '#27AE60';
-        } else if (calculatedTime <= 8) {
-            // 보통 (노란색/주황색)
-            statusBox.style.backgroundColor = '#fffdf0';
-            statusBox.style.borderColor = '#F1C40F';
-            statusBadge.style.backgroundColor = '#F39C12';
-            statusBadge.innerText = '보통';
-            waitTimeDisplay.style.color = '#D35400';
-        } else {
-            // 혼잡 (빨간색)
-            statusBox.style.backgroundColor = '#fdf2f2';
-            statusBox.style.borderColor = '#E74C3C';
-            statusBadge.style.backgroundColor = '#E74C3C';
-            statusBadge.innerText = '혼잡';
-            waitTimeDisplay.style.color = '#C0392B';
-        }
+        btnElement.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-600');
+        btnElement.disabled = true;
+      }
     }
 
-    // 증감 버튼 실행 함수
-    function changeQueue(delta) {
-        queueCount += delta;
-        if (queueCount < 0) queueCount = 0;
-        updateDashboard();
+    function showQuizCompletion() {
+      document.getElementById('quizContainer').classList.add('hidden');
+      document.getElementById('quizProgress').classList.add('hidden');
+      document.getElementById('quizCompleteCard').classList.remove('hidden');
+      startEmojiRain();
     }
 
-    // 직접 입력창 변경 시
-    function onDirectInput(val) {
-        let parsedVal = parseInt(val);
-        if (isNaN(parsedVal) || parsedVal < 0) parsedVal = 0;
-        queueCount = parsedVal;
-        updateDashboard();
+    // --- 축하 이모티콘 폭죽 효과 ---
+    function startEmojiRain() {
+      const emojis = ['🎉', '🥳', '🍕', '🍔', '🍟', '⭐', '🥇', '🍱', '🍗'];
+      setInterval(() => {
+        const emoji = document.createElement('div');
+        emoji.className = 'floating-emoji text-2xl';
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        emoji.style.left = Math.random() * 90 + 5 + 'vw';
+        emoji.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+        document.body.appendChild(emoji);
+
+        setTimeout(() => {
+          emoji.remove();
+        }, 4500);
+      }, 300);
     }
 
-    // 슬라이더 이동 시
-    function onSliderChange(val) {
-        queueCount = parseInt(val);
-        updateDashboard();
+    renderQuiz();
+
+    // --- 3. 실시간 제보 데이터 로직 ---
+    let votes = { '쾌적': 12, '보통': 8, '혼잡': 4 };
+
+    function voteStatus(type) {
+      votes[type]++;
+      updateVoteUI();
+      alert(`'${type}' 상태로 제보되었습니다. 참여해 주셔서 감사합니다!`);
     }
 
-    // 초기화 함수
-    function setPreset(count) {
-        queueCount = count;
-        updateDashboard();
+    function updateVoteUI() {
+      const total = votes['쾌적'] + votes['보통'] + votes['혼잡'];
+      const smoothP = Math.round((votes['쾌적'] / total) * 100);
+      const normalP = Math.round((votes['보통'] / total) * 100);
+      const busyP = 100 - smoothP - normalP;
+
+      document.getElementById('totalVotes').textContent = `총 ${total}명 참여`;
+      document.getElementById('barSmooth').style.width = smoothP + '%';
+      document.getElementById('barNormal').style.width = normalP + '%';
+      document.getElementById('barBusy').style.width = busyP + '%';
+
+      document.getElementById('smoothPercent').textContent = smoothP;
+      document.getElementById('normalPercent').textContent = normalP;
+      document.getElementById('busyPercent').textContent = busyP;
     }
-
-    // 초기 로드
-    updateDashboard();
-</script>
-
+  </script>
 </body>
 </html>
